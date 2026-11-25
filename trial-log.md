@@ -40,11 +40,14 @@ bought-tape entry filter, a half take-profit, and a creator-sell / big-sell ejec
 | v14 | add-on at +5%, allowed after take-half | -0.063 | -0.006 | 0.011 | 266 | 118 | 65.4% | worse — adding into noise retracements loses. Add-on reverted |
 | v15 | SL -6% (from -8%) | -0.059 | -0.006 | 0.007 | 255 | 118 | 53.9% | worse — SL back to -8% |
 | v16 | max runup +50% → +20% | -0.017 | -0.002 | 0.002 | 52 | 25 | 84.1% | slightly better PnL but only 25 mints → ~6 in final window. REJECTED on guardrail risk; runup back to +50% |
-| v17 | TP rest +25%, trail 8% (from 20%/6%) | -0.023 | -0.002 | 0.007 | 258 | 118 | 57.0% | ≈ v10 (+0.0004 SOL). FINAL. Stress test below |
+| v17 | TP rest +25%, trail 8% (from 20%/6%) | -0.023 | -0.002 | 0.007 | 258 | 118 | 57.0% | ≈ v10 (+0.0004 SOL). FINAL candidate |
+| v18 | base tier gets fast exits (TP 6/12, trail 5, SL -4, hold 60) to cut its bleed | -0.023 | -0.002 | 0.007 | 258 | 118 | 57.0% | IDENTICAL to v17 — base coins exit via dev-sell/big-sell, not TP/SL. Kept (same behavior, documented intent). FINAL |
 
-## Stress (grade-local --stress 20, v17)
+## Stress (grade-local --stress 20, v17; --stress-jobs 2, ~22 min)
 
-TBD — running.
+- Median −0.094 SOL, p10 −0.156 SOL, p90 +0.008 SOL; 17/20 copies below zero; 0 failed; dev rank 17/20; warning "half or more of the rebuilt copies lost money".
+- Honest read: the dev score (−0.023) is a better-than-median draw; on resampled windows this bot typically loses ~0.09 SOL. No baseline does better (sniper dev −0.468, reversion −3.887, momentum −9.460), and the final window is one unseen draw — the entry's edge is relative to the field, not an absolute profit guarantee.
+- Tier split (dev, from per_token realized PnL): strict tier +0.0185 SOL over ~74 coins (22 winners); base tier −0.0419 SOL over ~46 coins (5 winners). The base tier is guardrail insurance: it buys ~12 extra expected mints in the 6 h final window (118 dev mints over 24 h → ~29 expected final vs ~14 for strict-only), keeping the 20-mint guardrail safe.
 
 ## Final config (v17)
 

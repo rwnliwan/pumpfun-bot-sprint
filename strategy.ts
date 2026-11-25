@@ -105,7 +105,17 @@ interface Held {
   peakValue: bigint;
   tookHalf: boolean;
   lastTradeSlot: number;
+  strict: boolean;
 }
+
+// Base-tier coins (guardrail-sized 0.01 SOL stakes, weak tape) leave much
+// faster: they rarely run, so a tight take-profit and stop cut the bleed
+// without costing any coin count.
+const BASE_TAKE_HALF_BPS = 600;
+const BASE_TAKE_REST_BPS = 1200;
+const BASE_TRAIL_BPS = 500;
+const BASE_STOP_BPS = 400;
+const BASE_MAX_HOLD_SLOTS = 60;
 
 
 function priceOf(vq: bigint, vt: bigint): number {
@@ -219,12 +229,17 @@ await runBot({
       h.lastTradeSlot = Math.max(h.lastTradeSlot, curve.reserves_slot);
 
       const tape = tapes.get(mint);
+      const takeHalfBps = h.strict ? TAKE_HALF_BPS : BASE_TAKE_HALF_BPS;
+      const takeRestBps = h.strict ? TAKE_REST_BPS : BASE_TAKE_REST_BPS;
+      const trailBps = h.strict ? TRAIL_BPS : BASE_TRAIL_BPS;
+      const stopBps = h.strict ? STOP_BPS : BASE_STOP_BPS;
+      const maxHold = h.strict ? MAX_HOLD_SLOTS : BASE_MAX_HOLD_SLOTS;
       let reason = '';
-      if (value * 10_000n >= cost * BigInt(10_000 + TAKE_REST_BPS)) reason = 'take-rest';
-      else if (!h.tookHalf && value * 10_000n >= cost * BigInt(10_000 + TAKE_HALF_BPS)) reason = 'take-half';
-      else if (h.tookHalf && value * 10_000n <= h.peakValue * BigInt(10_000 - TRAIL_BPS)) reason = 'trail';
-      else if (value * 10_000n <= cost * BigInt(10_000 - STOP_BPS)) reason = 'stop';
-      else if (batch.slot - h.openedSlot >= MAX_HOLD_SLOTS) reason = 'max-hold';
+      if (value * 10_000n >= cost * BigInt(10_000 + takeRestBps)) reason = 'take-rest';
+      else if (!h.tookHalf && value * 10_000n >= cost * BigInt(10_000 + takeHalfBps)) reason = 'take-half';
+      else if (h.tookHalf && value * 10_000n <= h.peakValue * BigInt(10_000 - trailBps)) reason = 'trail';
+      else if (value * 10_000n <= cost * BigInt(10_000 - stopBps)) reason = 'stop';
+      else if (batch.slot - h.openedSlot >= maxHold) reason = 'max-hold';
       else if (batch.slot - h.lastTradeSlot >= STALE_SLOTS) reason = 'stale';
       else if (tape !== undefined && tape.devSold) reason = 'dev-sold';
       else if (tape !== undefined && tape.bigSellBps >= BigInt(BIG_SELL_EXIT_BPS)) reason = 'big-sell';
@@ -328,6 +343,7 @@ await runBot({
         peakValue: amount,
         tookHalf: false,
         lastTradeSlot: batch.slot,
+        strict: strictNow,
       });
       free -= amount + tx;
       slots -= 1;
