@@ -55,3 +55,11 @@ bought-tape entry filter, a half take-profit, and a creator-sell / big-sell ejec
 - Sizing: strict tier (≥ 5 buyers, ≥ 6 buy trades) 0.25 SOL, base 0.01 SOL; both capped at 1% of real reserve (cap binds first on most coins); max 5 open, max 2 new entries per batch.
 - Exits: take half +8%, rest +25%, trail 8% after first take-profit, stop −8%, max hold 150 slots, stale 90 slots, creator-sell / big-sell (≥ 25% of reserve) eject.
 - Dev: net PnL −0.023 SOL, return −0.0023, max DD 0.0073, 258 fills, 118 distinct mints, 118 round trips, compliant. Still slightly negative on dev — the dev window's strict subset is the only profitable slice, and the base tier is guardrail insurance (~0.04 SOL) for the unseen 6-hour final window.
+
+## Submission status (25 Nov 2026)
+
+- Repo: https://github.com/rwnliwan/pumpfun-bot-sprint (public, created 2026-11-25T02:42:50Z, after opening; default branch `main`; About: homepage = bounty page, topics makefun/ai-agents/bounties — verified via `gh api`).
+- HEAD pushed: `9e87152e7c59440abf5f905e6c6aee023a8509c9` (= ls-remote). Tree clean. README: 3 live make.fun badges, 0 shields.io. `.makefun/owner.json` committed (wallet `FwUebjzYUBF6uybmEkUkiQf9z35bGGQuUE3GrToXFcUq`).
+- Bundle v1: `~/workspace/make-fun/marathon-pumpfun/pumpfun-bot-sprint-bundle-v1.tar.gz`, 244,477 B, sha256 `b6a7bf0ab44be78b65c4555f15319d03f1a406195de05f1b3a648cfad5133949` — **0 usage rows attached** (builder subagent session still running; rows flush only when the run ends).
+- Check v1: **14 passed / 1 failed / 4 skipped** — only `thinking_priced` fails (0 usage rows). `thinking_reproduces` 88.4%, `thinking_revised` pass.
+- NOT YET SUBMITTED. Next step (koordinator, after this builder run ends): re-bundle from the ORIGINAL session file `~/agents/agent-3c60bbf7-0346-43e7-a5a0-df1c4ecb3673/sessions/3c60bbf7-0346-43e7-a5a0-df1c4ecb3673.jsonl` with `--muse-usage` from the muse.db SELECT for agent_ids `3c60bbf7-0346-43e7-a5a0-df1c4ecb3673` (builder) + `8fbcd08d-9925-4645-901c-5dd73786f11c` (koordinator), same `--prompt-file ~/workspace/make-fun/marathon-pumpfun/prompt.txt --prompt-origin other --prompt-via "whatsapp"` flags; expect "≥1 usage row attached"; re-check (expect 14/0 or 15/0); then submit with the new bundle + `--commit <full HEAD sha>` (no `--play-code`); on clean 202 write claim-codes + Drive backup, then report.
